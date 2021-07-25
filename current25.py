@@ -58,16 +58,19 @@ def htmlForLoginButton():
     htmlLoginButton = f"<a href='{auth_url}'>Login to Spotify</a>"
     return htmlLoginButton
 
-t = threading.Thread(target=run, kwargs={'host': '', 'port': config.PORT_NUMBER})
-t.start()
-
 def update_user_current25(current25, sp):
     items = sp.current_user_saved_tracks(limit=25, offset=0)["items"]
     current_favs = [x["track"]["id"] for x in items]
     sp.playlist_replace_items(current25, current_favs)
 
-# read Liked Songs, delete songs in current 25 and add last 25 Liked Songs
-while True:
-    for (_, current25, sp) in user_data:
-        update_user_current25(current25, sp)
-    time.sleep(3600)
+def main():
+    t = threading.Thread(target=run, kwargs={'host': '', 'port': config.PORT_NUMBER})
+    t.start()
+    # read Liked Songs, delete songs in current 25 and add last 25 Liked Songs
+    while True:
+        for (_, current25, sp) in user_data:
+            update_user_current25(current25, sp)
+        time.sleep(3600)
+
+if __name__ == "__main__":
+    main()
