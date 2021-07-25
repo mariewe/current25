@@ -1,16 +1,23 @@
 from bottle import route, run, request
 import config
+import pickle
 import threading
+import time
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
 sp_oauth = SpotifyOAuth(client_id=config.MY_ID,
                         client_secret=config.MY_SECRET,
                         redirect_uri=config.SPOTIFY_REDIRECT_URI,
-                        scope="user-library-read,playlist-modify-private",
+                        scope="user-library-read,playlist-modify-private,playlist-modify-public",
                         cache_path=config.CACHE)
 
 sp = spotipy.Spotify(auth_manager=sp_oauth)
+try:
+    with open("user_data", "rb") as f:
+        user_data = pickle.load(f)
+except:
+    user_data=[]
 
 # handle spotify login via web server
 
@@ -24,7 +31,7 @@ def index():
 
     if token_info:
         print("Found cached token!")
-        access_token = token_info['access_token']
+        return
     else:
         url = request.url
         code = sp_oauth.parse_response_code(url)
@@ -35,10 +42,14 @@ def index():
     if access_token:
         print("Access token available! Trying to get user information...")
         sp = spotipy.Spotify(access_token)
+        user_id = sp.me()['id']
         # create current 25 playlist for user
-        current25 = sp.user_playlist_create(sp.me()['id'], "current 25")
+        current25 = sp.user_playlist_create(user_id, "current 25")["id"]
         # list of tupels of user id, playlist id, object with access token
-        
+        user_data.append((user_id, current25, sp))
+        with open("user_data", "wb") as f:
+            pickle.dump(user_data, f)
+        update_user_current25(current25, sp)
     else:
         return htmlForLoginButton()
 
@@ -50,10 +61,13 @@ def htmlForLoginButton():
 t = threading.Thread(target=run, kwargs={'host': '', 'port': config.PORT_NUMBER})
 t.start()
 
-# create current 25 playlist
-current25 = sp.user_playlist_create(sp.me()['id'], "current 25")
+def update_user_current25(current25, sp):
+    items = sp.current_user_saved_tracks(limit=25, offset=0)["items"]
+    current_favs = [x["track"]["id"] for x in items]
+    sp.playlist_replace_items(current25, current_favs)
 
 # read Liked Songs, delete songs in current 25 and add last 25 Liked Songs
-#while True:
-
-    #sleep 2 hrs
+while True:
+    for (_, current25, sp) in user_data:
+        update_user_current25(current25, sp)
+    time.sleep(3600)
