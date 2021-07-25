@@ -1,1 +1,3 @@
 config.py
+.spotipyoauthcache
+__pycache__
