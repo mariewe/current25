@@ -2,7 +2,8 @@
 Fetches your 25 most recent Liked Songs from Spotify into a Spotify playlist.
 This playlist is automatically created once and automatically updated every hour.
 Hence, you always have a playlist with your current 25 favourite songs which you can shuffle and share.
-![](screenshot.jpg)
+
+![](screenshot.JPG)
 
 ## 2 Types of Using
 You can either use this tool directly via this website:
