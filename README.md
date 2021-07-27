@@ -6,7 +6,7 @@ Hence, you always have a playlist with your current 25 favourite songs which you
 ![](screenshot.JPG)
 
 ## 2 Types of Using
-You can either use this tool directly via this website:
+You can either use this tool directly via this website: https://current25.mariewetzig.de
 Or, you can run this program on your own server.
 Only in the second case the following information is relevant:
 
