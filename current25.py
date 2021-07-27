@@ -1,4 +1,4 @@
-from bottle import route, run, request
+from bottle import route, run, request, template
 import config
 import pickle
 import threading
@@ -31,7 +31,7 @@ def index():
 
     # login button to Spotify API
     if code == url:
-        return htmlForLoginButton()
+        return htmlForLoginPage()
 
     # in case you're logged in in Spotify API create new cache with token
     print("Found Spotify auth code in Request URL! Trying to get valid access token...")
@@ -50,7 +50,7 @@ def index():
     user_id = sp.me()['id']
     # check if user id already exists in user_data (aka check if playlist exists)
     if user_id in user_data:
-        return
+        return template("ready")
     # create current 25 playlist for user
     current25 = sp.user_playlist_create(user_id, "my current 25")["id"]
     # assign user id to of playlist id and token info
@@ -60,11 +60,11 @@ def index():
         pickle.dump(user_data, f)
     # fill the newly created current 25 playlist
     update_user_current25(current25, sp)
+    return template("ready")
 
-def htmlForLoginButton():
+def htmlForLoginPage():
     auth_url = sp_oauth_global.get_authorize_url()
-    htmlLoginButton = f"<a href='{auth_url}'>Login to Spotify</a>"
-    return htmlLoginButton
+    return template("login", link=auth_url)
 
 def update_user_current25(current25, sp):
     items = sp.current_user_saved_tracks(limit=25, offset=0)["items"]
@@ -74,7 +74,6 @@ def update_user_current25(current25, sp):
 def main():
     t = threading.Thread(target=run, kwargs={'host': '', 'port': config.PORT_NUMBER})
     t.start()
-    # read Liked Songs, delete songs in current 25 and add last 25 Liked Songs
     while True:
         for (user_id, (current25, token_info)) in user_data.items():
             # refresh access token
