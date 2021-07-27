@@ -26,7 +26,6 @@ except:
 
 @route('/')
 def index():
-
     url = request.url
     code = sp_oauth_global.parse_response_code(url)
 
