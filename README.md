@@ -11,18 +11,25 @@ Or, you can run this program on your own server.
 Only in the second case the following information is relevant:
 
 ### Dependencies
-- bottle: Install bottle so that the users' spotify login is handled via web server. \
+- bottle: Install bottle so that the users' spotify login is handled via web server.
  ```
   pip3 install bottle
  ```
-- spotipy: Install spotipy, a wrapper for the Spotify Web API. \
+- spotipy: Install spotipy, a wrapper for the Spotify Web API.
  ```
   pip3 install spotipy
  ```
-  
+  Also, you need to create an app on the Spotify for Developers Site. Here you'll get an ID and key for your app.
 ### Configuration
 You need to write a config.py file and save it in your local current25 directory.
 The config.py should look like this:
+ ```
+MY_ID = <your ID for this Spotify App>
+MY_SECRET = <your secret key for this Spotify App>
+PORT_NUMBER = <port number of the local website which handles spotify login>
+SPOTIFY_REDIRECT_URI = <redirect uri>
+CACHE = <cache>
+ ```
 ### Run
 Now you can run current25.py with python3.
 - The playlist "current 25" will be created automatically. You can change its name, privacy, etc.
