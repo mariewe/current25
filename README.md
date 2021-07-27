@@ -11,11 +11,11 @@ Or, you can run this program on your own server.
 Only in the second case the following information is relevant:
 
 ### Dependencies
-- bottle: Install bottle so that the users' spotify login is handled via web server.\
+- bottle: Install bottle so that the users' spotify login is handled via web server. \
  ```
   pip3 install bottle
  ```
-- spotipy: Install spotipy, a wrapper for the Spotify Web API.\
+- spotipy: Install spotipy, a wrapper for the Spotify Web API. \
  ```
   pip3 install spotipy
  ```
