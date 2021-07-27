@@ -1,3 +1,6 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Poppins&amp;display=swap" rel="stylesheet">
 <style>
 .github {
   color: #5e6771;
@@ -12,7 +15,7 @@
 }
 </style>
 
-<body style="background-color:#48515B; font-family: 'Arial'; color:white; text-align:center;
+<body style="background-color:#48515B; font-family: 'Poppins'; color:white; text-align:center;
 display:flex; align-items:center; justify-content: center">
 <a class="github" href="https://github.com/mariewe/current25">
   <svg aria-hidden="true" data-prefix="fab" data-icon="github" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" data-fa-i2svg="">
