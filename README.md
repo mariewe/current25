@@ -32,5 +32,5 @@ CACHE = <cache>
  ```
 ### Run
 Now you can run current25.py with python3.
-- The playlist "current 25" will be created automatically. You can change its name, privacy, etc.
+- The playlist "my current 25" will be created automatically. You can change its name, privacy, etc.
 - The idea is to run current25.py permanently; then your playlist will be updated hourly.
