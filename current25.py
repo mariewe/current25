@@ -6,13 +6,14 @@ import time
 import string
 import random
 import os
+import free_ipod_pic
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
 sp_oauth_global = SpotifyOAuth(client_id=config.MY_ID,
                         client_secret=config.MY_SECRET,
                         redirect_uri=config.SPOTIFY_REDIRECT_URI,
-                        scope="user-library-read,playlist-modify-private,playlist-modify-public",
+                        scope="user-library-read,playlist-modify-private,playlist-modify-public, ugc-image-upload",
                         cache_path=config.CACHE)
 
 sp = spotipy.Spotify(auth_manager=sp_oauth_global)
@@ -52,8 +53,9 @@ def index():
     if user_id in user_data:
         return template("ready")
     # create current 25 playlist for user, save playlist id
-    current25 = sp.user_playlist_create(user_id, "my current 25")["id"]
-    #playlist_upload_cover_image(current25, insung-yoon-2uGNgqKIvNo-unsplash)
+    current25 = sp.user_playlist_create(user_id, "my current 25", description = "My 25 most recently Liked Songs, automatically synced every hour. https://github.com/mariewe/current25")["id"]
+    sp.playlist_upload_cover_image(current25, free_ipod_pic.PIC)
+
     # assign user id to of playlist id and token info
     user_data[user_id] = (current25, token_info)
     # write user_data to file
