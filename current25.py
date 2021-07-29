@@ -29,7 +29,7 @@ def index():
     url = request.url
     code = sp_oauth_global.parse_response_code(url)
 
-    # login button to Spotify API
+    # login page to Spotify API
     if code == url:
         return htmlForLoginPage()
 
@@ -51,8 +51,9 @@ def index():
     # check if user id already exists in user_data (aka check if playlist exists)
     if user_id in user_data:
         return template("ready")
-    # create current 25 playlist for user
+    # create current 25 playlist for user, save playlist id
     current25 = sp.user_playlist_create(user_id, "my current 25")["id"]
+    #playlist_upload_cover_image(current25, insung-yoon-2uGNgqKIvNo-unsplash)
     # assign user id to of playlist id and token info
     user_data[user_id] = (current25, token_info)
     # write user_data to file
