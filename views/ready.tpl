@@ -28,6 +28,13 @@
     .github:hover {
       color: white;
     }
+    .imprint {
+      color: #5e6771;
+      position: absolute;
+      bottom: 1.375em;
+      left: auto;
+      font-size: 0.625em
+    }
     </style>
   </head>
 
@@ -43,5 +50,8 @@
       <h1>Done! Your playlist is ready and will be updated automatically.</h1>
       <p>You can find the playlist on your Spotify profile. It's called "my current 25". You can change its name, privacy, etc.</p>
     </div>
+    <a class="imprint" href="/imprint">
+      Imprint
+    </a>
   </body>
 </html>

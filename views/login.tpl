@@ -39,6 +39,13 @@
       .github:hover {
         color: white;
       }
+      .imprint {
+        color: #5e6771;
+        position: absolute;
+        bottom: 1.375em;
+        left: auto;
+        font-size: 0.625em
+      }
     </style>
   </head>
 
@@ -55,5 +62,8 @@
       <p>Creates Spotify playlist with your 25 most recently Liked Songs. This playlist is automatically synced every hour.</p>
       <a class="button" href="{{link}}">Login to Spotify</a>
     </div>
+    <a class="imprint" href="/imprint">
+      Imprint
+    </a>
   </body>
 </html>

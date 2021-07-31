@@ -1,4 +1,4 @@
-from bottle import route, run, request, template
+from bottle import route, run, request, template, redirect
 import config
 import pickle
 import threading
@@ -13,7 +13,7 @@ from spotipy.oauth2 import SpotifyOAuth
 sp_oauth_global = SpotifyOAuth(client_id=config.MY_ID,
                         client_secret=config.MY_SECRET,
                         redirect_uri=config.SPOTIFY_REDIRECT_URI,
-                        scope="user-library-read,playlist-modify-private,playlist-modify-public, ugc-image-upload",
+                        scope="user-library-read,playlist-modify-private,playlist-modify-public,ugc-image-upload",
                         cache_path=config.CACHE)
 
 sp = spotipy.Spotify(auth_manager=sp_oauth_global)
@@ -42,7 +42,11 @@ def index():
                         redirect_uri=config.SPOTIFY_REDIRECT_URI,
                         scope="user-library-read,playlist-modify-private,playlist-modify-public",
                         cache_path=cache_file)
-    sp_oauth.get_access_token(code, as_dict=False)
+    try:
+        sp_oauth.get_access_token(code, as_dict=False)
+    except:
+        redirect('/')
+
     token_info = sp_oauth.get_cached_token()
     os.remove(cache_file)
 
@@ -53,16 +57,17 @@ def index():
     if user_id in user_data:
         return template("ready")
     # create current 25 playlist for user, save playlist id
-    current25 = sp.user_playlist_create(user_id, "my current 25", description = "My 25 most recently Liked Songs, automatically synced every hour. https://github.com/mariewe/current25")["id"]
+    current25 = sp.user_playlist_create(user_id, "my current 25", description = "My 25 most recently Liked Songs,\
+automatically synced every hour. https://github.com/mariewe/current25")["id"]
     sp.playlist_upload_cover_image(current25, free_ipod_pic.PIC)
-
-    # assign user id to of playlist id and token info
+    # assign user id to playlist id and token info
     user_data[user_id] = (current25, token_info)
     # write user_data to file
     with open("user_data", "wb") as f:
         pickle.dump(user_data, f)
     # fill the newly created current 25 playlist
     update_user_current25(current25, sp)
+
     return template("ready")
 
 def htmlForLoginPage():
@@ -74,13 +79,21 @@ def update_user_current25(current25, sp):
     current_favs = [x["track"]["id"] for x in items]
     sp.playlist_replace_items(current25, current_favs)
 
+@route('/imprint')
+def imprint():
+    return template("imprint")
+
 def main():
     t = threading.Thread(target=run, kwargs={'host': '', 'port': config.PORT_NUMBER})
     t.start()
     while True:
         for (user_id, (current25, token_info)) in user_data.items():
             # refresh access token
+
             token_info = sp_oauth_global.validate_token(token_info)
+            if token_info is None:
+                print("Refresh token didn't work for this user:", user_id)
+                continue
             sp = spotipy.Spotify(token_info['access_token'])
             user_data[user_id] = (current25, token_info)
             # update current 25 playlist
