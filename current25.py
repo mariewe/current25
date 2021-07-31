@@ -89,7 +89,6 @@ def main():
     while True:
         for (user_id, (current25, token_info)) in user_data.items():
             # refresh access token
-
             token_info = sp_oauth_global.validate_token(token_info)
             if token_info is None:
                 print("Refresh token didn't work for this user:", user_id)
