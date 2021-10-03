@@ -40,7 +40,7 @@ def index():
     sp_oauth = SpotifyOAuth(client_id=config.MY_ID,
                         client_secret=config.MY_SECRET,
                         redirect_uri=config.SPOTIFY_REDIRECT_URI,
-                        scope="user-library-read,playlist-modify-private,playlist-modify-public",
+                        scope="user-library-read,playlist-modify-private,playlist-modify-public,ugc-image-upload",
                         cache_path=cache_file)
     try:
         sp_oauth.get_access_token(code, as_dict=False)
@@ -57,8 +57,8 @@ def index():
     if user_id in user_data:
         return template("ready")
     # create current 25 playlist for user, save playlist id
-    current25 = sp.user_playlist_create(user_id, "my current 25", description = "My 25 most recently Liked Songs,\
-automatically synced every hour. https://github.com/mariewe/current25")["id"]
+    current25 = sp.user_playlist_create(user_id, "my current 25", description = "My 25 most recently Liked Songs, \
+ automatically synced every hour. https://github.com/mariewe/current25")["id"]
     sp.playlist_upload_cover_image(current25, free_ipod_pic.PIC)
     # assign user id to playlist id and token info
     user_data[user_id] = (current25, token_info)
