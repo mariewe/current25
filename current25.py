@@ -44,7 +44,7 @@ def index():
     try:
         sp_oauth.get_access_token(code, as_dict=False)
     except:
-        redirect("current25.mariewetzig.de")
+        redirect("https://current25.mariewetzig.de")
 
     token_info = sp_oauth.get_cached_token()
     os.remove(cache_file)
