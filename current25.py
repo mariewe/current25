@@ -16,7 +16,6 @@ sp_oauth_global = SpotifyOAuth(client_id=config.MY_ID,
                         scope="user-library-read,playlist-modify-private,playlist-modify-public,ugc-image-upload",
                         cache_path=config.CACHE)
 
-sp = spotipy.Spotify(auth_manager=sp_oauth_global)
 try:
     with open("user_data", "rb") as f:
         user_data = pickle.load(f)
@@ -25,7 +24,7 @@ except:
 
 # handle spotify login via web server
 
-@route('/')
+@route("/")
 def index():
     url = request.url
     code = sp_oauth_global.parse_response_code(url)
@@ -45,20 +44,20 @@ def index():
     try:
         sp_oauth.get_access_token(code, as_dict=False)
     except:
-        redirect('/')
+        redirect("current25.mariewetzig.de")
 
     token_info = sp_oauth.get_cached_token()
     os.remove(cache_file)
 
     print("Access token available! Trying to get user information...")
-    sp = spotipy.Spotify(token_info['access_token'])
-    user_id = sp.me()['id']
+    sp = spotipy.Spotify(token_info["access_token"])
+    user_id = sp.me()["id"]
     # check if user id already exists in user_data (aka check if playlist exists)
     if user_id in user_data:
         return template("ready")
     # create current 25 playlist for user, save playlist id
     current25 = sp.user_playlist_create(user_id, "my current 25", description = "My 25 most recently Liked Songs, \
- automatically synced every hour. https://github.com/mariewe/current25")["id"]
+automatically synced every hour. https://github.com/mariewe/current25")["id"]
     sp.playlist_upload_cover_image(current25, free_ipod_pic.PIC)
     # assign user id to playlist id and token info
     user_data[user_id] = (current25, token_info)
@@ -79,12 +78,12 @@ def update_user_current25(current25, sp):
     current_favs = [x["track"]["id"] for x in items]
     sp.playlist_replace_items(current25, current_favs)
 
-@route('/imprint')
+@route("/imprint")
 def imprint():
     return template("imprint")
 
 def main():
-    t = threading.Thread(target=run, kwargs={'host': '', 'port': config.PORT_NUMBER})
+    t = threading.Thread(target=run, kwargs={"host": "", "port": config.PORT_NUMBER})
     t.start()
     while True:
         for (user_id, (current25, token_info)) in user_data.items():
@@ -93,7 +92,7 @@ def main():
             if token_info is None:
                 print("Refresh token didn't work for this user:", user_id)
                 continue
-            sp = spotipy.Spotify(token_info['access_token'])
+            sp = spotipy.Spotify(token_info["access_token"])
             user_data[user_id] = (current25, token_info)
             # update current 25 playlist
             update_user_current25(current25, sp)
