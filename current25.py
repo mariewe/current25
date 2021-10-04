@@ -99,6 +99,7 @@ def main():
     t = threading.Thread(target=run, kwargs={"host": "", "port": config.PORT_NUMBER})
     t.start()
     while True:
+        users_to_remove = []
         for (user_id, (current25, token_info)) in user_data.items():
             # refresh access token
             token_info = sp_oauth_global.validate_token(token_info)
@@ -107,12 +108,15 @@ def main():
                 continue
             sp = spotipy.Spotify(token_info["access_token"])
             user_data[user_id] = (current25, token_info)
-            # delete user if playlist doesn't exist
+            # remember user if current25 playlist doesn't exist
             if not playlist_exists_for_user(user_id, sp):
-                user_data.pop(user_id)
+                users_to_remove.append(user_id)
                 continue
             # update current 25 playlist
             update_user_current25(current25, sp)
+        # delete users if their current25 playlist doesn't exist
+        for user_id in users_to_remove:
+            user_data.pop(user_id)
         time.sleep(3600)
 
 if __name__ == "__main__":
