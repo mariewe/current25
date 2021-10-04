@@ -76,11 +76,15 @@ def htmlForLoginPage():
     return template("login", link=auth_url)
 
 def playlist_exists_for_user(user_id, sp):
-    try:
-        sp.playlist(user_data[user_id][0])
-        return True
-    except spotipy.SpotifyException:
-        return False
+    offset = 0
+    current25 = user_data[user_id][0]
+    while True:
+        playlists = sp.current_user_playlists(offset=offset)
+        if current25 in playlists:
+            return True
+        if len(playlists) < 50 or offset >= 500:
+            return False
+        offset += 50
 
 def update_user_current25(current25, sp):
     items = sp.current_user_saved_tracks(limit=25, offset=0)["items"]
