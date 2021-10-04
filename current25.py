@@ -52,9 +52,11 @@ def index():
     print("Access token available! Trying to get user information...")
     sp = spotipy.Spotify(token_info["access_token"])
     user_id = sp.me()["id"]
-    # check if user id already exists in user_data (aka check if playlist exists)
-    if user_id in user_data:
+
+    # check if user id already exists in user_data and check if playlist exists
+    if user_id in user_data and playlist_exists_for_user(user_id, sp):
         return template("ready")
+
     # create current 25 playlist for user, save playlist id
     current25 = sp.user_playlist_create(user_id, "my current 25", description = "My 25 most recently Liked Songs, \
 automatically synced every hour. https://github.com/mariewe/current25")["id"]
@@ -72,6 +74,13 @@ automatically synced every hour. https://github.com/mariewe/current25")["id"]
 def htmlForLoginPage():
     auth_url = sp_oauth_global.get_authorize_url()
     return template("login", link=auth_url)
+
+def playlist_exists_for_user(user_id, sp):
+    try:
+        sp.playlist(user_data[user_id][0])
+        return True
+    except spotipy.SpotifyException:
+        return False
 
 def update_user_current25(current25, sp):
     items = sp.current_user_saved_tracks(limit=25, offset=0)["items"]
@@ -94,6 +103,10 @@ def main():
                 continue
             sp = spotipy.Spotify(token_info["access_token"])
             user_data[user_id] = (current25, token_info)
+            # delete user if playlist doesn't exist
+            if not playlist_exists_for_user(user_id, sp):
+                user_data.pop(user_id)
+                continue
             # update current 25 playlist
             update_user_current25(current25, sp)
         time.sleep(3600)

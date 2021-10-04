@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Current 25 Login</title>
+    <title>Current 25 Ready</title>
     <meta name="description" content="Creates and automatically syncs Spotify playlist with your 25 most recently Liked Songs.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="white">
@@ -49,6 +49,7 @@
     <div style="padding-bottom:0.67em">
       <h1>Done! Your playlist is ready and will be updated automatically.</h1>
       <p>You can find the playlist on your Spotify profile. It's called "my current 25". You can change its name, privacy, etc.</p>
+      <p>Just delete the playlist if you don't want to use it anymore.</p>
     </div>
     <a class="imprint" href="/imprint">
       Imprint
