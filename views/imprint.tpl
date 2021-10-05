@@ -16,7 +16,7 @@
         Fließstr. 20<br>
         12439 Berlin</p>
       <p>Telefon: 0179 4229682<br>
-        E-Mail: marie.wetzg@web.de </p>
+        E-Mail: marie.wetzig@web.de </p>
       <p><strong>Disclaimer – rechtliche Hinweise</strong>
       § 1 Haftungsbeschränkung<br>
       Die Inhalte dieser Website werden mit größtmöglicher Sorgfalt erstellt. Der Anbieter übernimmt jedoch keine Gewähr für die Richtigkeit, Vollständigkeit und Aktualität der bereitgestellten Inhalte. Die Nutzung der Inhalte der Website erfolgt auf eigene Gefahr des Nutzers. Namentlich gekennzeichnete Beiträge geben die Meinung des jeweiligen Autors und nicht immer die Meinung des Anbieters wieder. Mit der reinen Nutzung der Website des Anbieters kommt keinerlei Vertragsverhältnis zwischen dem Nutzer und dem Anbieter zustande.</p>
