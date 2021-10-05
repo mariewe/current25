@@ -79,8 +79,10 @@ def playlist_exists_for_user(user_id, sp):
     offset = 0
     current25 = user_data[user_id][0]
     while True:
-        playlists = sp.current_user_playlists(offset=offset)
-        if current25 in playlists:
+        results = sp.current_user_playlists(offset=offset)
+        playlists = results["items"]
+        playlist_ids = [item["id"] for item in playlists]
+        if current25 in playlist_ids:
             return True
         if len(playlists) < 50 or offset >= 500:
             return False
