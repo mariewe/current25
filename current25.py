@@ -104,7 +104,11 @@ def main():
         users_to_remove = []
         for (user_id, (current25, token_info)) in user_data.items():
             # refresh access token
-            token_info = sp_oauth_global.validate_token(token_info)
+            try:
+                token_info = sp_oauth_global.validate_token(token_info)
+            except:
+                print("Fehler bei Tokenvalidierung", traceback.format_exc())
+                continue
             if token_info is None:
                 print("Refresh token didn't work for this user:", user_id)
                 continue
