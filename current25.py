@@ -7,6 +7,7 @@ import string
 import random
 import os
 import free_ipod_pic
+import traceback
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
