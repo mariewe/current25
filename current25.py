@@ -59,6 +59,7 @@ def index():
         return template("ready")
 
     # create current 25 playlist for user, save playlist id
+    print("Creating playlist for new user")
     current25 = sp.user_playlist_create(user_id, "my current 25", description = "My 25 most recently Liked Songs, \
 automatically synced every hour. https://github.com/mariewe/current25")["id"]
     sp.playlist_upload_cover_image(current25, free_ipod_pic.PIC)
@@ -80,6 +81,8 @@ def playlist_exists_for_user(user_id, sp):
     offset = 0
     current25 = user_data[user_id][0]
     while True:
+        print("Requesting user's playlists starting from", offset)
+        time.sleep(1)
         results = sp.current_user_playlists(offset=offset)
         playlists = results["items"]
         playlist_ids = [item["id"] for item in playlists]
@@ -90,6 +93,7 @@ def playlist_exists_for_user(user_id, sp):
         offset += 50
 
 def update_user_current25(current25, sp):
+    print("Filling user's playlist with new songs")
     items = sp.current_user_saved_tracks(limit=25, offset=0)["items"]
     current_favs = [x["track"]["id"] for x in items]
     sp.playlist_replace_items(current25, current_favs)
@@ -102,6 +106,7 @@ def main():
     t = threading.Thread(target=run, kwargs={"host": "", "port": config.PORT_NUMBER})
     t.start()
     while True:
+        print("Updating all current25 playlists")
         users_to_remove = []
         for (user_id, (current25, token_info)) in user_data.items():
             # refresh access token
@@ -116,7 +121,9 @@ def main():
             sp = spotipy.Spotify(token_info["access_token"])
             user_data[user_id] = (current25, token_info)
             # remember user if current25 playlist doesn't exist
+            print("Checking if current25 playlist exists for this user:", user_id)
             if not playlist_exists_for_user(user_id, sp):
+                print("Playlist did not exist, removing user")
                 users_to_remove.append(user_id)
                 continue
             # update current 25 playlist
