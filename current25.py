@@ -4,6 +4,7 @@ import pickle
 import threading
 import time
 import string
+import urllib3.exceptions
 import random
 import os
 import free_ipod_pic
@@ -118,16 +119,21 @@ def main():
             if token_info is None:
                 print("Refresh token didn't work for this user:", user_id)
                 continue
-            sp = spotipy.Spotify(token_info["access_token"])
-            user_data[user_id] = (current25, token_info)
-            # remember user if current25 playlist doesn't exist
-            print("Checking if current25 playlist exists for this user:", user_id)
-            if not playlist_exists_for_user(user_id, sp):
-                print("Playlist did not exist, removing user")
-                users_to_remove.append(user_id)
-                continue
-            # update current 25 playlist
-            update_user_current25(current25, sp)
+            try:
+                sp = spotipy.Spotify(token_info["access_token"])
+                user_data[user_id] = (current25, token_info)
+                # remember user if current25 playlist doesn't exist
+                print("Checking if current25 playlist exists for this user:", user_id)
+                if not playlist_exists_for_user(user_id, sp):
+                    print("Playlist did not exist, removing user")
+                    users_to_remove.append(user_id)
+                    continue
+                # update current 25 playlist
+                update_user_current25(current25, sp)
+            except urllib3.exceptions.TimeoutError:
+                print(f"Request to Spotify API timed out. This can be ignored.")
+            except Exception as e:
+                print(f"Different (possibly more severe) exception occured while update playlist for {user_id}: {e}")
         # delete users if their current25 playlist doesn't exist
         for user_id in users_to_remove:
             user_data.pop(user_id)
