@@ -59,7 +59,7 @@
     </a>
     <div style="padding-bottom:0.67em">
       <h1>Your Current 25 Favourite Songs</h1>
-      <p>Creates Spotify playlist with your 25 most recently Liked Songs. This playlist is automatically synced every hour.</p>
+      <p>Creates Spotify playlist with your 25 most recently Liked Songs. This playlist is automatically synced every five minutes.</p>
       <p>Hence, you always have an up-to-date playlist with your latest favourite songs which you can shuffle and share.</p>
       <a class="button" href="{{link}}">Login to Spotify</a>
     </div>
