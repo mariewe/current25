@@ -4,6 +4,7 @@ import pickle
 import threading
 import time
 import string
+import urllib3.exceptions
 import random
 import os
 import free_ipod_pic
@@ -17,11 +18,13 @@ sp_oauth_global = SpotifyOAuth(client_id=config.MY_ID,
                         scope="user-library-read,playlist-modify-private,playlist-modify-public,ugc-image-upload",
                         cache_path=config.CACHE)
 
-try:
-    with open("user_data", "rb") as f:
-        user_data = pickle.load(f)
-except:
-    user_data={}
+mutex = threading.Lock()
+with mutex:
+    try:
+        with open("user_data", "rb") as f:
+            user_data = pickle.load(f)
+    except:
+        user_data={}
 
 # handle spotify login via web server
 
@@ -54,20 +57,22 @@ def index():
     sp = spotipy.Spotify(token_info["access_token"])
     user_id = sp.me()["id"]
 
-    # check if user id already exists in user_data and check if playlist exists
-    if user_id in user_data and playlist_exists_for_user(user_id, sp):
-        return template("ready")
+    with mutex:
+        # check if user id already exists in user_data and check if playlist exists
+        if user_id in user_data and playlist_exists_for_user(user_id, sp):
+            return template("ready")
 
-    # create current 25 playlist for user, save playlist id
-    print("Creating playlist for new user")
-    current25 = sp.user_playlist_create(user_id, "my current 25", description = "My 25 most recently Liked Songs, \
-automatically synced every hour. https://github.com/mariewe/current25")["id"]
-    sp.playlist_upload_cover_image(current25, free_ipod_pic.PIC)
-    # assign user id to playlist id and token info
-    user_data[user_id] = (current25, token_info)
-    # write user_data to file
-    with open("user_data", "wb") as f:
-        pickle.dump(user_data, f)
+        # create current 25 playlist for user, save playlist id
+        print("Creating playlist for new user")
+        current25 = sp.user_playlist_create(user_id, "my current 25", description = "My 25 most recently Liked Songs, \
+    automatically synced every five minutes. https://github.com/mariewe/current25")["id"]
+        sp.playlist_upload_cover_image(current25, free_ipod_pic.PIC)
+        # assign user id to playlist id and token info
+        user_data[user_id] = (current25, token_info)
+        # write user_data to file
+        with open("user_data", "wb") as f:
+            pickle.dump(user_data, f)
+
     # fill the newly created current 25 playlist
     update_user_current25(current25, sp)
 
@@ -108,30 +113,36 @@ def main():
     while True:
         print("Updating all current25 playlists")
         users_to_remove = []
-        for (user_id, (current25, token_info)) in user_data.items():
-            # refresh access token
-            try:
-                token_info = sp_oauth_global.validate_token(token_info)
-            except:
-                print("Fehler bei Tokenvalidierung", traceback.format_exc())
-                continue
-            if token_info is None:
-                print("Refresh token didn't work for this user:", user_id)
-                continue
-            sp = spotipy.Spotify(token_info["access_token"])
-            user_data[user_id] = (current25, token_info)
-            # remember user if current25 playlist doesn't exist
-            print("Checking if current25 playlist exists for this user:", user_id)
-            if not playlist_exists_for_user(user_id, sp):
-                print("Playlist did not exist, removing user")
-                users_to_remove.append(user_id)
-                continue
-            # update current 25 playlist
-            update_user_current25(current25, sp)
-        # delete users if their current25 playlist doesn't exist
-        for user_id in users_to_remove:
-            user_data.pop(user_id)
-        time.sleep(3600)
+        with mutex:
+            for (user_id, (current25, token_info)) in user_data.items():
+                # refresh access token
+                try:
+                    token_info = sp_oauth_global.validate_token(token_info)
+                except:
+                    print("Fehler bei Tokenvalidierung", traceback.format_exc())
+                    continue
+                if token_info is None:
+                    print("Refresh token didn't work for this user:", user_id)
+                    continue
+                try:
+                    sp = spotipy.Spotify(token_info["access_token"])
+                    user_data[user_id] = (current25, token_info)
+                    # remember user if current25 playlist doesn't exist
+                    print("Checking if current25 playlist exists for this user:", user_id)
+                    if not playlist_exists_for_user(user_id, sp):
+                        print("Playlist did not exist, removing user")
+                        users_to_remove.append(user_id)
+                        continue
+                    # update current 25 playlist
+                    update_user_current25(current25, sp)
+                except urllib3.exceptions.TimeoutError:
+                    print(f"Request to Spotify API timed out. This can be ignored.")
+                except Exception as e:
+                    print(f"Different (possibly more severe) exception occured while update playlist for {user_id}: {e}")
+            # delete users if their current25 playlist doesn't exist
+            for user_id in users_to_remove:
+                user_data.pop(user_id)
+        time.sleep(300)
 
 if __name__ == "__main__":
     main()
