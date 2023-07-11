@@ -1,6 +1,6 @@
 # current25
 Puts your 25 most recent Liked Songs from Spotify into a Spotify playlist.
-This playlist is automatically created once and automatically updated every hour.
+This playlist is automatically created once and updated every 5 minutes.
 Hence, you always have a playlist with your current 25 favourite songs which you can shuffle and share.
 
 ![](screenshot.JPG)
